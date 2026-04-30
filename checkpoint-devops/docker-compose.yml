@@ -1,0 +1,53 @@
+# ── docker-compose.yml – DimDim (FastAPI + Oracle XE) ───────────────────────
+
+networks:
+  dimdim-network:
+    driver: bridge
+
+volumes:
+  oracle-data:          # Volume nomeado para persistência do Oracle
+
+services:
+
+  # ── 1) Banco de Dados Oracle XE ──────────────────────────────────────────
+  oracle-db:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: oracle-db-RM565146     
+    restart: unless-stopped
+    networks:
+      - dimdim-network
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata     # Volume nomeado (regra 02)
+    environment:
+      ORACLE_PASSWORD: dimdim123            # senha do SYS/SYSTEM
+      ORACLE_DATABASE: XEPDB1
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 300s
+
+  # ── 2) Aplicação FastAPI ──────────────────────────────────────────────────
+  dimdim-api:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: dimdim-api-RM565146
+    restart: unless-stopped
+    networks:
+      - dimdim-network
+    ports:
+      - "8000:8000"
+    environment:
+      DB_USER: system
+      DB_PASSWORD: dimdim123
+      DB_HOST: oracle-db                    # nome do container na rede
+      DB_PORT: "1521"
+      DB_SERVICE: XEPDB1
+      APP_ENV: production
+    depends_on:
+      oracle-db:
+        condition: service_healthy
