@@ -235,9 +235,8 @@ docker network rm dimdim-network
 
 | RM | Nome |
 |---|---|
-| RM000000 | Integrante 1 |
-| RM000001 | Integrante 2 |
-| RM000002 | Integrante 3 |
+| RM565146 | Maria Gabriela Landim Severo |
+| RM559072 | Samara Porto Souza |
 
 > **Disciplina:** DevOps Tools & Cloud Computing  
 > **Professor:** João Menk – profjoao.menk@fiap.com.br  
