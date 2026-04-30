@@ -70,7 +70,7 @@ docker volume create oracle-data
 
 # 3. Container Oracle XE
 docker run -d \
-  --name oracle-db-RM000000 \
+  --name oracle-db-RM565146 \
   --network dimdim-network \
   -p 1521:1521 \
   -v oracle-data:/opt/oracle/oradata \
@@ -79,26 +79,26 @@ docker run -d \
   gvenzl/oracle-xe:21-slim
 
 # Aguardar Oracle ficar saudável (~2 min)
-docker logs -f oracle-db-RM000000
+docker logs -f oracle-db-RM565146
 
 # 4. Build da imagem da API
 docker build -t dimdim-api:latest ./app
 
 # 5. Container da API
 docker run -d \
-  --name dimdim-api-RM000000 \
+  --name dimdim-api-RM565146 \
   --network dimdim-network \
   -p 8000:8000 \
   -e DB_USER=system \
   -e DB_PASSWORD=dimdim123 \
-  -e DB_HOST=oracle-db-RM000000 \
+  -e DB_HOST=oracle-db-RM565146 \
   -e DB_PORT=1521 \
   -e DB_SERVICE=XEPDB1 \
   -e APP_ENV=production \
   dimdim-api:latest
 ```
 
-> 💡 Use o script automatizado: `bash scripts/setup_docker.sh RM000000`
+> 💡 Use o script automatizado: `bash scripts/setup_docker.sh RM565146`
 
 ---
 
@@ -109,11 +109,11 @@ docker run -d \
 az login
 
 # Deploy completo (cria ACR, sobe Oracle XE e API no ACI)
-bash scripts/deploy_azure.sh RM000000
+bash scripts/deploy_azure.sh RM565146
 ```
 
 O script cria automaticamente:
-- Resource Group `rg-dimdim-rm000000`
+- Resource Group `rg-dimdim-rm565146`
 - Azure Container Registry
 - 2x Azure Container Instances (oracle-db + dimdim-api)
 
@@ -223,8 +223,8 @@ dimdim-docker/
 docker compose down -v
 
 # Manual
-docker stop dimdim-api-RM000000 oracle-db-RM000000
-docker rm   dimdim-api-RM000000 oracle-db-RM000000
+docker stop dimdim-api-RM565146 oracle-db-RM565146
+docker rm   dimdim-api-RM565146 oracle-db-RM565146
 docker volume rm oracle-data
 docker network rm dimdim-network
 ```
